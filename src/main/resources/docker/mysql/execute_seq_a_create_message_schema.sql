@@ -1,1 +1,1 @@
-CREATE SCHEMA `message` ;
+CREATE SCHEMA `imonitor` ;

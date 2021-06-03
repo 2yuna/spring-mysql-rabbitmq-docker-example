@@ -1,15 +1,6 @@
 version: "3"
 
 services:
-  rabbitmq-container:
-    image: rabbitmq:3-management
-    ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
-      - ./rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
-
   mysql-container:
     image: mysql
     ports:
@@ -18,7 +9,19 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     volumes:
       - ./mysql:/docker-entrypoint-initdb.d:ro
+      - .mysql-data:/var/lib/mysql
 
+#  mongo-container:
+#    image: mongo:4.4.5
+#    ports:
+#      - 27017:27017
+#    environment:
+#      - MONGO_INITDB_DATABASE=imonitor
+#      - MONGO_INITDB_ROOT_USERNAME=root
+#      - MONGO_INITDB_ROOT_PASSWORD=imonitor!Secret@Hospital&
+#    volumes:
+#      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+#      - ./mongo-volume:/data/db
 
   app-container:
     build:
@@ -27,10 +30,11 @@ services:
     ports:
       - 8085:8085
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-container:3306/message?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-container:3306/imonitor?useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_RABBITMQ_HOST=rabbitmq-container
     depends_on:
-      - rabbitmq-container
       - mysql-container
+#      - mongo-container
+volumes:
+  mysql-data:
